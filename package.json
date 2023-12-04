@@ -5,14 +5,30 @@
   "description": "",
   "main": "./src/index.js",
   "scripts": {
-    "dev": "node --watch ./src/index.js"
+    "dev": "nodemon ./src/index.js"
   },
   "keywords": [],
   "author": "Miti",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1511.0",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
     "date-fns": "^2.30.0",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "fs-extra": "^11.1.1"
+    "fs": "^0.0.1-security",
+    "fs-extra": "^11.1.1",
+    "handlebars": "^4.7.8",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "knex": "^3.0.1",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.7",
+    "path": "^0.12.7",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
