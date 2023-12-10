@@ -1,10 +1,10 @@
 const express = require('express');
-const verifyLogin = require('./middlewares/authorization');
-const { listCategories } = require('./controller/product');
-const { registerUser, loginUser } = require('./controller/users');
-const validateReqBody = require('./middlewares/validateReqBody');
-const schemaEmailAndPassword = require('./schemas/schemaEmailAndPass');
-const schemaUser = require('./schemas/schemaUser');
+const verifyLogin = require('../middlewares/authorization');
+const listCategories = require('../controllers/categotias');
+const { registerUser, loginUser } = require('../controllers/users');
+const validateReqBody = require('../middlewares/validateReqBody');
+const schemaEmailAndPassword = require('../schemas/schemaEmailAndPass');
+const schemaUser = require('../schemas/schemaUser');
 
 const router = express();
 
