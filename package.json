@@ -4,7 +4,8 @@
   "description": "| [<img src=\"https://avatars.githubusercontent.com/u/141876403?v=4\" width=115><br><sub>José Jeferson Lima Feitosa</sub>](https://github.com/JJefersonLimaF)|",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon ../src/index.js"
+    "dev": "nodemon ../src/index.js",
+    "start": "node ../src/index.js"
   },
   "keywords": [],
   "author": "",

@@ -1,4 +1,4 @@
-const knex = require('../connections/db');
+const knex = require('../connections/database');
 const { format } = require('date-fns');
 
 const cadastrarPedido = async (req, res) => {

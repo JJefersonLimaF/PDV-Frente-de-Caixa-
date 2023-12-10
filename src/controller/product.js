@@ -1,4 +1,4 @@
-const knex = require('../connections/db');
+const knex = require('../connections/database');
 const { uploadFile, deletArchives } = require('../services/storage');
 
 const cadastrarProduto = async (req, res) => {

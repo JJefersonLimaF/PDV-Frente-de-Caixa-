@@ -1,4 +1,4 @@
-const knex = require('../connections/databaseConnection');
+const knex = require('../connections/database');
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 
