@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const knex = require('../connections/database');
 const jwt = require('jsonwebtoken');
 
