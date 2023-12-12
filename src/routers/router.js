@@ -11,14 +11,14 @@ const router = express();
 
 router.use(express.json());
 
-router.get('/categoria', listCategories)
-router.get('/');
 
+router.get('/categoria', listCategories)
 router.post('/usuarios', validateReqBody(schemaUser), registerUser);
 router.post('/login', validateReqBody(schemaEmailAndPassword), loginUser);
 
 router.use(verifyLogin);
 
+router.get('/');
 router.get('/');
 
 module.exports = router;
