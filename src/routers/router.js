@@ -18,7 +18,6 @@ router.post('/login', validateReqBody(schemaEmailAndPassword), loginUser);
 
 router.use(verifyLogin);
 
-router.get('/');
-router.get('/');
+
 
 module.exports = router;
