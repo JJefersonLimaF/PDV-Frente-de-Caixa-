@@ -1,22 +1,33 @@
 const express = require('express');
-const verifyLogin = require('../middlewares.js/autorizacao');
 const listCategories = require('../controller/categories');
 const usuarios = require('../controller/usuarios');
-const validateReqBody = require('../middlewares.js/validarCorpoRequisicao');
 const schemaEmailAndPassword = require('../schemas/schemaEmail&Senha');
-const schemaUser = require('../schemas/schemaUsuario');
+const schemaUsuario = require('../schemas/schemaUsuario');
+const validarCorpoRequisicao = require('../middlewares.js/validarCorpoRequisicao');
+const {schemaCorpoDoProduto, schemaCorpoDoPedido} = require('../schemas/schemaProduto');
+const {verificarProdutos} = require('../middlewares.js/verificarPedido');
+const { listarPedido, cadastrarPedido } = require('../controller/pedidos');
+const { verificarIdDoProduto, produtoDuplicado } = require('../middlewares.js/verificarProduto');
+const verificarLogin = require('../middlewares.js/autorizacao');
+const { apagarArquivo } = require('../controller/produtos');
+const uploadFile = multer.single('produto_imagem');
 const rotas = express();
-
 
 rotas.use(express.json());
 
 
 rotas.get('/categoria', listCategories)
-rotas.post('/usuario', validateReqBody(schemaUser), usuarios.registerUser);  
-rotas.post('/login', validateReqBody(schemaEmailAndPassword), usuarios.loginUser);
+rotas.post('/usuario', validateReqBody(schemaUsuario), usuarios.cadastrarUsuario);  
+rotas.post('/login', validateReqBody(schemaEmailAndPassword), usuarios.loginUsuario);
 
-rotas.use(verifyLogin);
+rotas.use(verificarLogin);
 
+router.post('/produto', uploadFile, validarCorpoRequisicao(schemaCorpoDoProduto), produtoDuplicado, cadastrarProduto);
+router.get('/produto', listarProdutos);
+router.get('/produto/:id', verificarIdDoProduto, encontrarIdProduto);
+router.delete('/produto/:id', verificarIdDoProduto, apagarArquivo);
 
+router.post('/pedido', validarCorpoRequisicao(schemaCorpoDoPedido), verificarProdutos, cadastrarPedido);
+router.get('/pedido', listarPedido);
 
 module.exports = rotas;

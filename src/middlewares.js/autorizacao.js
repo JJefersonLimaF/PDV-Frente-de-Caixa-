@@ -2,7 +2,7 @@ const knex = require('../connections/database');
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 
-const verifyLogin = async (req, res, next) => {
+const verificarLogin = async (req, res, next) => {
     const { authorization } = req.headers;
 
     if (!authorization) {
@@ -31,4 +31,4 @@ const verifyLogin = async (req, res, next) => {
     };
 };
 
-module.exports = verifyLogin;
+module.exports = verificarLogin;

@@ -1,22 +1,22 @@
-const knex = require('../connections/db');
+const knex = require('../connections/database');
 const { format } = require('date-fns');
 
 const cadastrarPedido = async (req, res) => {
     const { data, pedido_produtos } = req.body;
-    const ValorTotal = req.total;
+    const totalPrice = req.total;
     try {
-        const dataPedido = data ? data : format(new Date(), 'dd-MM-yyyy');
-        const totalPedido= await knex('pedidos').insert({ data: dataPedido, valor_total: valorTotal}).returning('*');
+        const dataOrder = data ? data : format(new Date(), 'dd-MM-yyyy');
+        const registerTotalOrder = await knex('pedidos').insert({ data: dataOrder, valor_total: totalPrice }).returning('*');
         for (const each of pedido_produtos) {
-            await knex('pedido_produtos').insert({ pedido_id: registroTotalpedido[0].id, produto_id: each.produto_id, quantidade_produto: each.quantidade_produto }).returning('*');
+            await knex('pedido_produtos').insert({ pedido_id: registerTotalOrder[0].id, produto_id: each.produto_id, quantidade_produto: each.quantidade_produto }).returning('*');
         };
 
-        const dataFormatada = format(registroTotalpedido[0].data, 'dd-MM-yyyy');
+        const formatedData = format(registerTotalOrder[0].data, 'dd-MM-yyyy');
 
         const returnObject = {
-            id: registroTotalpedido[0].id,
-            data: dataFormatada,
-            valor_total: registroTotalpedido[0].valor_total
+            id: registerTotalOrder[0].id,
+            data: formatedData,
+            valor_total: registerTotalOrder[0].valor_total
         };
 
         return res.status(201).json(returnObject);
@@ -25,7 +25,7 @@ const cadastrarPedido = async (req, res) => {
     };
 };
 
-const listarPedidos = async (req, res) => {
+const listarPedido = async (req, res) => {
     const { a_partir } = req.query;
     try {
         const query = knex('pedidos')
@@ -45,19 +45,19 @@ const listarPedidos = async (req, res) => {
                 }
             });
 
-        const pedidos = await query;
+        const orders = await query;
 
-        const dataFormatada = pedidos.map((element) => {
-            const dataFormatada = format(element.data, 'dd-MM-yyyy')
+        const formatedData = orders.map((element) => {
+            const formatedData = format(element.data, 'dd-MM-yyyy')
             return {
                 ...element,
-                data: dataFormatada
+                data: formatedData
             };
         });
 
-        const pedidosAgrupados = {};
+        const groupedOrders = {};
 
-        for (const each of dataFormatada) {
+        for (const each of formatedData) {
             const {
                 pedido_id,
                 valor_total,
@@ -68,14 +68,14 @@ const listarPedidos = async (req, res) => {
                 produto_id
             } = each;
 
-            if (!pedidosAgrupados [pedido_id]) {
-                pedidosAgrupados [pedido_id] = {
+            if (!groupedOrders[pedido_id]) {
+                groupedOrders[pedido_id] = {
                     pedido: { id: pedido_id, valor_total, data },
                     pedido_produtos: []
                 };
             };
 
-            pedidosAgrupados [pedido_id].pedido_produtos.push({
+            groupedOrders[pedido_id].pedido_produtos.push({
                 id: pedido_produto_id,
                 quantidade_produto,
                 valor_produto,
@@ -84,7 +84,7 @@ const listarPedidos = async (req, res) => {
             });
         };
 
-        const finalList = Object.values(pedidosAgrupados );
+        const finalList = Object.values(groupedOrders);
 
         return res.status(200).json(finalList);
     } catch (error) {
@@ -93,6 +93,6 @@ const listarPedidos = async (req, res) => {
 };
 
 module.exports = {
-    registrarPedido,
-    listarPedidos
+    cadastrarPedido,
+    listarPedido
 };

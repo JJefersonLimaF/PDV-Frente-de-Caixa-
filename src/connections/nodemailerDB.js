@@ -1,25 +1,32 @@
 const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
+const transportador = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
-    secure: true,
+    // secure: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     }
 });
 
-const enviarEmail = (to, subject, body) => {
+const usuario = (req, res) => {
+    return user = req.user;
+}
 
-    transporter.sendMail({
-        from: process.env.EMAIL_FROM,
-        to,
-        subject,
-        html: body
-    })
-    
+const send = {
+        from: `${process.env.EMAIL_NAME} <${process.env.EMAIL_FROM}>`,
+        to: `${usuario.nome} <${usuario.email}>`,
+        subject: 'Cadastro concluído com sucesso!',
+        
+
 };
-console.log(enviarEmail)
 
-module.exports = enviarEmail;
+
+const sendEmail = async () => {
+    await transportador.sendMail(send);
+};
+
+
+
+module.exports = sendEmail;

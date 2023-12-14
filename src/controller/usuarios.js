@@ -1,10 +1,9 @@
 const bcrypt = require('bcryptjs');
 const knex = require('../connections/database');
 const jwt = require('jsonwebtoken');
-const enviarEmail = require('../connections/nodemailerDB');
+const sendEmail = require('../connections/nodemailerDB')
 
-
-const registerUser = async (req, res) => {
+const cadastrarUsuario = async (req, res) => {
     const {nome, email, senha} = req.body;
 
     try {
@@ -23,25 +22,23 @@ const registerUser = async (req, res) => {
             senha: senhaCripitografada
         }).returning('*')
 
-        if (!usuario[0]) {
+        if (!usuario) {
             return res.status(400).json({menssagem: 'O usuário não foi cadastrado!'})        
         }
-        
-        const {senha: _, ...novousuario} = usuario[0];
 
-        enviarEmail('jeffersonlima.zeno@gmail.com', 'Cadastro de Usuário', '<h1>Olá, seja bem vindo!</h1>')
-       
-        console.log(enviarEmail)
-        return res.status(201).json(novousuario);
-        
+        sendEmail();
+
+        return res.status(201).json({mensagem: 'usuario cadastrado.'});
 
     } catch (error) {
+        console.log(error)
         return res.status(500).json({message: error.message});
     }
 
 };
 
-const loginUser = async (req, res) => {
+
+const loginUsuario = async (req, res) => {
 
     const {email, senha} = req.body;
 
@@ -71,6 +68,6 @@ const loginUser = async (req, res) => {
 };
 
 module.exports = {
-    registerUser,
-    loginUser
+    cadastrarUsuario,
+    loginUsuario
 }
