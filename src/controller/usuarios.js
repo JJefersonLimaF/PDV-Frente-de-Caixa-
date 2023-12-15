@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const knex = require('../connections/database');
 const jwt = require('jsonwebtoken');
 const transportador = require('../connections/nodemailerDB');
@@ -27,11 +27,11 @@ const cadastrarUsuario = async (req, res) => {
             return res.status(400).json({menssagem: 'O usuário não foi cadastrado!'});     
         }
 
-            const html = htmlCompiler('../template/email.html', {
+            const html = await htmlCompiler( '../template/email.html', {
                 nomeusuario: usuario.nome,
             });
 
-            transportador.sendMail({
+            await transportador.sendMail({
                 from: `${process.env.EMAIL_NAME} <${process.env.EMAIL_FROM}>`,
                 to: `${usuario.nome}${usuario.email}`,
                 subject: 'Cadastro de Usuário.',

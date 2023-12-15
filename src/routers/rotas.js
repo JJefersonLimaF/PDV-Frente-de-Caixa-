@@ -1,5 +1,4 @@
 const express = require('express');
-const multer = require('../services/multer')
 const usuarios = require('../controller/usuarios');
 const schemaEmailAndPassword = require('../schemas/schemaEmail&Senha');
 const schemaUsuario = require('../schemas/schemaUsuario');
@@ -11,6 +10,7 @@ const {verificarIdDoProduto, duplicado} = require('../middlewares.js/verificarPr
 const verificarLogin = require('../middlewares.js/autorizacao');
 const produtos = require('../controller/produtos');
 const listCategorias = require('../controller/categorias');
+const upload = require('../services/multer');
 const rotas = express();
 
 rotas.use(express.json());
@@ -22,7 +22,7 @@ rotas.post('/login', validarCorpoRequisicao(schemaEmailAndPassword), usuarios.lo
 
 rotas.use(verificarLogin);
 
-rotas.post('/produto', multer.single('produto_imagem'), validarCorpoRequisicao(schemaCorpoDoProduto), duplicado, produtos.cadastrarProduto);
+rotas.post('/produto', upload.single('produto_imagem'), validarCorpoRequisicao(schemaCorpoDoProduto), duplicado, produtos.cadastrarProduto);
 
 rotas.get('/produto', produtos.listarProdutos);
 rotas.get('/produto/:id', verificarIdDoProduto, produtoPeloId, produtos.encontrarIdProduto);
