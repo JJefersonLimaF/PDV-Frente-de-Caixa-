@@ -1,9 +1,6 @@
 const knex = require('../connections/database');
 
 
-const produtoPeloId = async (produto_Id) => {
-    return await knex('produtos').where({ id: produto_id}).first();
-};
 
 const verificarProdutos = async (req, res, next) => {
 
@@ -11,9 +8,9 @@ const verificarProdutos = async (req, res, next) => {
     let total = 0;
 
     try {
-        const produtoPromises = pedido_produtos.map(async (each) => {
+        const produtoPromises = pedido_produtos.map(async (novo) => {
 
-            const { produto_id, quantidade_produto } = each;
+            const { produto_id, quantidade_produto } = novo;
 
             const encontrado = await produtoPeloId(produto_id);
 
@@ -33,6 +30,12 @@ const verificarProdutos = async (req, res, next) => {
     }
 };
 
+const produtoPeloId = async (produto_Id) => {
+    return await knex('produtos').where({id: produto_id}).first();
+};
+
 module.exports = {
-    verificarProdutos
+
+    verificarProdutos,
+    produtoPeloId
 };

@@ -2,33 +2,43 @@ const knex = require('../connections/database');
 const { format } = require('date-fns');
 
 const cadastrarPedido = async (req, res) => {
+
     const { data, pedido_produtos } = req.body;
-    const totalPrice = req.total;
+
+    const preco = req.total;
+
     try {
-        const dataOrder = data ? data : format(new Date(), 'dd-MM-yyyy');
-        const registerTotalOrder = await knex('pedidos').insert({ data: dataOrder, valor_total: totalPrice }).returning('*');
-        for (const each of pedido_produtos) {
-            await knex('pedido_produtos').insert({ pedido_id: registerTotalOrder[0].id, produto_id: each.produto_id, quantidade_produto: each.quantidade_produto }).returning('*');
+
+        const dataDoPedido = data ? data : format(new Date(), 'dd-MM-yyyy');
+
+        const totalDePedidos = await knex('pedidos').insert({data: dataDoPedido, valor_total: preco}).returning('*');
+       
+        for (const novo of pedido_produtos) {
+            await knex('pedido_produtos').insert({pedido_id: totalDePedidos[0].id, produto_id: novo.produto_id, quantidade_produto: novo.quantidade_produto}).returning('*');
         };
 
-        const formatedData = format(registerTotalOrder[0].data, 'dd-MM-yyyy');
+        const dataFinal = format(totalDePedidos[0].data, 'dd-MM-yyyy');
 
-        const returnObject = {
-            id: registerTotalOrder[0].id,
-            data: formatedData,
-            valor_total: registerTotalOrder[0].valor_total
+        const resultado = {
+            id: totalDePedidos[0].id,
+            data: dataFinal,
+            valor_total: totalDePedidos[0].valor_total
         };
 
-        return res.status(201).json(returnObject);
+        return res.status(201).json(resultado);
+
     } catch (error) {
         return res.status(500).json({ mensagem: 'Erro interno do servidor.' });
     };
 };
 
 const listarPedido = async (req, res) => {
-    const { a_partir } = req.query;
+
+    const { daquiEndiante } = req.query;
+
     try {
-        const query = knex('pedidos')
+
+        const BancoDePedidos = knex('pedidos')
             .select({
                 pedido_id: 'pedidos.id',
                 valor_total: 'pedidos.valor_total',
@@ -40,24 +50,26 @@ const listarPedido = async (req, res) => {
             })
             .leftJoin('pedido_produtos', 'pedidos.id', 'pedido_produtos.pedido_id')
             .leftJoin('produtos', 'pedido_produtos.produto_id', 'produtos.id').modify((queryBuilder) => {
-                if (a_partir) {
-                    queryBuilder.where('pedidos.data', '>=', a_partir);
+
+                if (daquiEndiante) {
+                    queryBuilder.where('pedidos.data', '>=', daquiEndiante);
                 }
             });
 
-        const orders = await query;
+        const pedidos = await BancoDePedidos;
 
-        const formatedData = orders.map((element) => {
-            const formatedData = format(element.data, 'dd-MM-yyyy')
+        const novaData = pedidos.map((item) => {
+
+            const novaData = format(item.data, 'dd-MM-yyyy')
             return {
-                ...element,
-                data: formatedData
+                ...item,
+                data: novaData
             };
         });
 
-        const groupedOrders = {};
+        const pedidoEmGrupo = {};
 
-        for (const each of formatedData) {
+        for (const dataItem of novaData) {
             const {
                 pedido_id,
                 valor_total,
@@ -66,16 +78,16 @@ const listarPedido = async (req, res) => {
                 quantidade_produto,
                 valor_produto,
                 produto_id
-            } = each;
+            } = dataItem;
 
-            if (!groupedOrders[pedido_id]) {
-                groupedOrders[pedido_id] = {
-                    pedido: { id: pedido_id, valor_total, data },
+            if (!pedidoEmGrupo[pedido_id]) {
+                pedidoEmGrupo[pedido_id] = {
+                    pedido: {id: pedido_id, valor_total, data},
                     pedido_produtos: []
                 };
             };
 
-            groupedOrders[pedido_id].pedido_produtos.push({
+            pedidoEmGrupo[pedido_id].pedido_produtos.push({
                 id: pedido_produto_id,
                 quantidade_produto,
                 valor_produto,
@@ -84,9 +96,10 @@ const listarPedido = async (req, res) => {
             });
         };
 
-        const finalList = Object.values(groupedOrders);
+        const listagemFinal = Object.values(pedidoEmGrupo);
 
-        return res.status(200).json(finalList);
+        return res.status(200).json(listagemFinal);
+
     } catch (error) {
         return res.status(500).json({ mensagem: 'Erro interno do servidor.' });
     };
@@ -94,5 +107,5 @@ const listarPedido = async (req, res) => {
 
 module.exports = {
     cadastrarPedido,
-    listarPedido
+    listarPedido,
 };

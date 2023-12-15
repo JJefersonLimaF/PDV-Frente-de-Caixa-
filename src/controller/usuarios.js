@@ -1,14 +1,15 @@
 const bcrypt = require('bcryptjs');
 const knex = require('../connections/database');
 const jwt = require('jsonwebtoken');
-const sendEmail = require('../connections/nodemailerDB')
+const transportador = require('../connections/nodemailerDB');
+const htmlCompiler = require('../services/htmlCompiller');
 
 const cadastrarUsuario = async (req, res) => {
     const {nome, email, senha} = req.body;
 
     try {
         
-        const emailExiste = await knex('usuarios').where({email}).first()
+        const emailExiste = await knex('usuarios').where({email}).first();
     
         if (emailExiste) {
             return res.status(400).json('Email já existe!');
@@ -20,15 +21,25 @@ const cadastrarUsuario = async (req, res) => {
             nome,
             email,
             senha: senhaCripitografada
-        }).returning('*')
+        }).returning('*');
 
         if (!usuario) {
-            return res.status(400).json({menssagem: 'O usuário não foi cadastrado!'})        
+            return res.status(400).json({menssagem: 'O usuário não foi cadastrado!'});     
         }
 
-        sendEmail();
+            const html = htmlCompiler('../template/email.html', {
+                nomeusuario: usuario.nome,
+            });
 
-        return res.status(201).json({mensagem: 'usuario cadastrado.'});
+            transportador.sendMail({
+                from: `${process.env.EMAIL_NAME} <${process.env.EMAIL_FROM}>`,
+                to: `${usuario.nome}${usuario.email}`,
+                subject: 'Cadastro de Usuário.',
+                html,
+            })
+       
+
+        return res.status(201).json({mensagem: 'Usuário cadastrado.'});
 
     } catch (error) {
         console.log(error)
@@ -69,5 +80,5 @@ const loginUsuario = async (req, res) => {
 
 module.exports = {
     cadastrarUsuario,
-    loginUsuario
-}
+    loginUsuario,
+};

@@ -1,4 +1,4 @@
-CREATE DATABASE pdv_cubos;
+CREATE DATABASE pdv;
 
 DROP TABLE IF EXISTS usuarios;
 

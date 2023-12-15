@@ -1,85 +1,99 @@
-const knex = require('../connections/db');
+const knex = require('../connections/database');
 const { uploadArquivo, deletarArquivo } = require('../services/imageStorage');
 
 const cadastrarProduto = async (req, res) => {
-    const { descricao, valor } = req.body;
-    const { file } = req;
 
+    const {descricao, valor } = req.body;
+
+    const {file} = req;
+    
     try {
-        const insertProduct = await knex('produtos').insert({
+        const produtoInserido = await knex('produtos').insert({
             descricao,
             valor
         }).returning('*');
 
         if (file) {
             try {
-                const image = await uploadArquivo(`products/${insertProduct[0].id}/${file.originalname}`, file.buffer, file.mimetype);
-                await knex('produtos').where({ id: insertProduct[0].id }).update({ produto_imagem: image.url });
+                const image = await uploadArquivo(`produtos/${produtoInserido[0].id}/${file.originalname}`, file.buffer, file.mimetype);
+                await knex('produtos').where({id: produtoInserido[0].id}).update({produto_imagem: image.url});
             } catch (error) {
-                return res.status(500).json({ mensagem: "Erro interno do servidor" });
+                return res.status(500).json({mensagem: "Erro interno do servidor"});
             }
         }
 
-        const finalProduct = await knex('produtos').where({ id: insertProduct[0].id }).first();
+        const produto = await knex('produtos').where({id: produtoInserido[0].id}).first();
 
-        if (!finalProduct) {
-            return res.status(400).json({ mensagem: 'O produto não foi cadastrado' });
+        if (!produto) {
+            return res.status(400).json({mensagem: 'Produto não cadastrado'});
         }
 
-        return res.status(200).json(finalProduct);
+        return res.status(200).json(produto);
+        
     } catch (error) {
         return res.status(500).json({ mensagem: "Erro interno do servidor" });
     }
 };
 
 const listarProdutos = async (req, res) => {
+
     try {
-        const listAll = await knex('produtos').returning('*');
-        if (!listAll.length === 0) {
-            return res.status(400).json('Nenhum produto encontrado');
+
+        const listar = await knex('produtos').returning('*');
+
+        if (!listar.length > 0) {
+            return res.status(400).json('Produto não encontrado');
         }
-        return res.status(200).json(listAll);
+
+        return res.status(200).json(listar);
+
     } catch (error) {
         return res.status(500).json({ mensagem: "Erro interno do servidor" });
     }
 };
 
 const encontrarIdProduto = async (req, res) => {
-    const { id } = req.params;
+
+    const {id} = req.params;
+
     try {
-        const encontrado = await knex('produtos').where({ id }).first();
+
+        const encontrado = await knex('produtos').where({id}).first();
+
         if (!encontrado) {
-            return res.status(404).json({ mensagem: 'Produto não encontrado' });
+            return res.status(404).json({mensagem: 'Produto não encontrado'});
         }
+
         return res.status(200).json(encontrado);
+
     } catch (error) {
-        return res.status(500).json({ mensagem: "Erro interno do servidor" });
+        return res.status(500).json({mensagem: "Erro interno do servidor"});
     }
 };
 
 const apagarArquivo = async (req, res) => {
-    const { id } = req.params;
+    const {id} = req.params;
 
     if (!id) {
-        return res.status(400).json("O id da imagem deve ser um número válido");
+        return res.status(400).json("O id do Arquivo obrigatóriamente deve ser válido");
     }
 
     try {
-        const product = await knex('produtos').where({ id }).first();
-        if (!product) {
-            return res.status(404).json({ mensagem: "Produto não encontrado" });
+        const produto = await knex('produtos').where({id}).first();
+        if (!produto) {
+            return res.status(404).json({mensagem: "Produto não encontrado"});
         }
 
-        if (product.produto_imagem) {
-            const path = product.produto_imagem.replace(/^.*?\/products\/\d+\//, `products/${id}/`);
-            await deletarArquivo(path);
+        if (produto.produto_imagem) {
+            const arq = produto.produto_imagem.replace(/^.*?\/produtos\/\d+\//, `produtos/${id}/`);
+            await deletarArquivo(arq);
         }
 
-        await knex('produtos').where({ id }).del();
+        await knex('produtos').where({id}).del();
 
         return res.sendStatus(204);
     } catch (error) {
-        return res.status(500).json({ mensagem: 'Erro interno do servidor' });
+        return res.status(500).json({mensagem: 'Erro interno do servidor'});
     }
 };
 
